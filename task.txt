@@ -1,0 +1,6 @@
+Subject,Marks
+Math,95
+Science,89
+English,78
+History,88
+Geography,92
