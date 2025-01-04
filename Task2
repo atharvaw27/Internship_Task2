@@ -1,0 +1,90 @@
+from fpdf import FPDF
+
+# Function to calculate grades
+def calculate_grade(mark):
+    if mark >= 90:
+        return "A"
+    elif mark >= 75:
+        return "B"
+    elif mark >= 60:
+        return "C"
+    elif mark >= 40:
+        return "D"
+    else:
+        return "F"
+
+# Function to read and analyze data from a text file
+def read_and_analyze(file_path):
+    subjects = []
+    marks = []
+    try:
+        with open(file_path, mode="r") as file:
+            lines = file.readlines()
+            for line in lines[1:]:  # Skip the header
+                subject, mark = line.strip().split(",")
+                subjects.append(subject)
+                marks.append(int(mark))
+        return subjects, marks
+    except FileNotFoundError:
+        print(f"Error: The file '{file_path}' was not found.")
+        return [], []
+    except ValueError:
+        print(f"Error: Invalid data format in the file.")
+        return [], []
+
+# Function to generate a PDF report
+def generate_pdf(subjects, marks):
+    if not subjects or not marks:
+        print("No data available to generate the PDF report.")
+        return
+    
+    # Calculate average marks and CGPA
+    total_marks = sum(marks)
+    avg_marks = total_marks / len(marks)
+    cgpa = avg_marks / 10  # Assuming CGPA = Average Marks / 10
+    
+    # Create a PDF instance
+    pdf = FPDF()
+    pdf.set_auto_page_break(auto=True, margin=15)
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    
+    # Title
+    pdf.set_font("Arial", style="B", size=16)
+    pdf.cell(0, 10, "Student Performance Report", ln=True, align="C")
+    pdf.ln(10)
+    
+    # Table Header
+    pdf.set_font("Arial", style="B", size=12)
+    pdf.cell(80, 10, "Subject", border=1, align="C")
+    pdf.cell(50, 10, "Marks", border=1, align="C")
+    pdf.cell(50, 10, "Grade", border=1, align="C")
+    pdf.ln()
+    
+    # Table Data
+    pdf.set_font("Arial", size=12)
+    for subject, mark in zip(subjects, marks):
+        grade = calculate_grade(mark)
+        pdf.cell(80, 10, subject, border=1, align="C")
+        pdf.cell(50, 10, str(mark), border=1, align="C")
+        pdf.cell(50, 10, grade, border=1, align="C")
+        pdf.ln()
+    
+    # Summary
+    pdf.ln(10)
+    pdf.set_font("Arial", style="B", size=12)
+    pdf.cell(0, 10, f"Average Marks: {avg_marks:.2f}", ln=True)
+    pdf.cell(0, 10, f"CGPA: {cgpa:.2f}", ln=True)
+    
+    # Save PDF
+    pdf.output("student_report.pdf")
+    print("PDF report generated as 'student_report.pdf'.")
+
+# Main function
+def main():
+    file_path = "C:/Users/ADMIN/OneDrive/Desktop/task.txt"
+    subjects, marks = read_and_analyze(file_path)
+    generate_pdf(subjects, marks)
+
+if __name__ == "__main__":
+    main()
